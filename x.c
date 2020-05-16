@@ -59,6 +59,7 @@ static void zoom(const Arg *);
 static void zoomabs(const Arg *);
 static void zoomreset(const Arg *);
 static void ttysend(const Arg *);
+static void next_theme(const Arg *);
 
 /* config.h for applying patches and the configuration. */
 #include "config.h"
@@ -186,6 +187,8 @@ static void mousereport(XEvent *);
 static char *kmap(KeySym, uint);
 static int match(uint, uint);
 
+static void set_theme(int idx);
+
 static void run(void);
 static void usage(void);
 
@@ -220,6 +223,8 @@ static DC dc;
 static XWindow xw;
 static XSelection xsel;
 static TermWindow win;
+// index in themes array from which colornames are copied
+static int theme_idx = 0;
 
 /* Font Ring Cache */
 enum {
@@ -320,6 +325,25 @@ zoomreset(const Arg *arg)
 		larg.f = defaultfontsize;
 		zoomabs(&larg);
 	}
+}
+
+void
+set_theme(int idx)
+{
+	if (idx >= LEN(themes)) {
+		idx = 0;
+	}
+	theme_idx = idx;
+	printf("new idx = %d\n", idx);
+	memcpy(colorname, themes[idx], sizeof(colorname));
+}
+
+void
+next_theme(const Arg *arg)
+{
+	set_theme(theme_idx + 1);
+	xloadcols();
+	redraw();
 }
 
 void
@@ -2036,6 +2060,7 @@ run:
 	if (!opt_title)
 		opt_title = (opt_line || !opt_cmd) ? "st" : opt_cmd[0];
 
+	set_theme(0);
 	setlocale(LC_CTYPE, "");
 	XSetLocaleModifiers("");
 	cols = MAX(cols, 1);

@@ -90,46 +90,127 @@ char *termname = "st-256color";
 unsigned int tabspaces = 8;
 
 /* Terminal colors (16 first used in escape sequence) */
-static const char *colorname[] = {
+static const char *colorname_my[] = {
+// static const char *colorname[] = {
 	/* 8 normal colors */
-	"black",
-	"red3",
-	"green3",
-	"yellow3",
-	"blue2",
-	"magenta3",
-	"cyan3",
-	"gray90",
+	[0] = "black",
+	[1] = "red3",
+	[2] = "green3",
+	[3] = "yellow3",
+	[4] = "blue2",
+	[5] = "magenta3",
+	[6] = "cyan3",
+	[7] = "gray90",
 
 	/* 8 bright colors */
-	"gray50",
-	"red",
-	"green",
-	"yellow",
-	"#5c5cff",
-	"magenta",
-	"cyan",
-	"white",
+	[8] = "gray50",
+	[9] = "red",
+	[10] = "green",
+	[11] = "yellow",
+	[12] = "#5c5cff",
+	[13] = "magenta",
+	[14] = "cyan",
+	[15] = "white",
 
 	[255] = 0,
 
 	/* more colors can be added after 255 to use with DefaultXX */
-	"#cccccc",
-	"#555555",
-
-	"#222222",
-	"#eeeeee",
+	[256] = "#222222", /* background */
+	[257] = "#eeeeee", /* foreground */
 };
 
+/* Terminal colors (16 first used in escape sequence) */
+// dracula theme
+static const char *colorname_dracula[] = {
+	/* 8 normal colors */
+	[0] = "#000000", /* black   */
+	[1] = "#ff5555", /* red     */
+	[2] = "#50fa7b", /* green   */
+	[3] = "#f1fa8c", /* yellow  */
+	[4] = "#bd93f9", /* blue    */
+	[5] = "#ff79c6", /* magenta */
+	[6] = "#8be9fd", /* cyan    */
+	[7] = "#bbbbbb", /* white   */
+
+	/* 8 bright colors */
+	[8]  = "#44475a", /* black   */
+	[9]  = "#ff5555", /* red     */
+	[10] = "#50fa7b", /* green   */
+	[11] = "#f1fa8c", /* yellow  */
+	[12] = "#bd93f9", /* blue    */
+	[13] = "#ff79c6", /* magenta */
+	[14] = "#8be9fd", /* cyan    */
+	[15] = "#ffffff", /* white   */
+
+	[255] = 0,
+
+	/* more colors can be added after 255 to use with DefaultXX */
+	/* special colors */
+	[256] = "#282a36", /* background */
+	[257] = "#f8f8f2", /* foreground */
+};
+
+// light theme
+static const char *colorname_light[] = {
+	/* 8 normal colors */
+	[0] = "#000000", /* black   */
+	[1] = "#ff5555", /* red     */
+	[2] = "#008033", /* green   */
+	[3] = "#f1fa8c", /* yellow  */
+	[4] = "#8100bd", /* blue    */
+	[5] = "#d900d2", /* magenta */
+	[6] = "#8be9fd", /* cyan    */
+	[7] = "#bbbbbb", /* white   */
+
+	/* 8 bright colors */
+	[8]  = "#44475a", /* black   */
+	[9]  = "#ff5555", /* red     */
+	[10] = "#008033", /* green   */
+	[11] = "#f1fa8c", /* yellow  */
+	[12] = "#8100bd", /* blue    */
+	[13] = "#d900d2", /* magenta */
+	[14] = "#8be9fd", /* cyan    */
+	[15] = "#ffffff", /* white   */
+
+	[255] = 0,
+
+	/* more colors can be added after 255 to use with DefaultXX */
+	/* special colors */
+	[256] = "#f8f8f4", /* background */
+	[257] = "#111111", /* foreground */
+};
+
+
+// array of themes: each theme must be of the
+// size (or at least of that size) as `colorname`
+// array below.
+static const char** themes[] = {
+	colorname_dracula,
+	colorname_my,
+	colorname_light,
+};
+
+// colorname is initialized from `themes`
+// each theme must be of 258 elements
+static char* colorname[258];
 
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 259;
-unsigned int defaultbg = 258;
-static unsigned int defaultcs = 256;
+unsigned int defaultfg = 257;
+unsigned int defaultbg = 256;
+static unsigned int defaultcs = 257;
 static unsigned int defaultrcs = 257;
+
+/*
+ * Colors used, when the specific fg == defaultfg. So in reverse mode this
+ * will reverse too. Another logic would only make the simple feature too
+ * complex.
+ */
+unsigned int defaultitalic = 7;
+unsigned int defaultunderline = 7;
+/*
 
 /*
  * Default shape of cursor
@@ -196,6 +277,7 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+	{ TERMMOD,              XK_X,    		next_theme,     {.i =  0} },
 };
 
 /*
